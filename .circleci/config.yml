@@ -31,26 +31,43 @@ jobs:
   #       --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
   #      --region us-east-1
   # Exercise: Config and Deployment
-  configure_infrastructure:
+  #configure_infrastructure:
+  #  docker:
+  #   - image: python:3.7-alpine3.11
+  #steps:
+  #  - checkout
+  #  - add_ssh_keys:
+  #     fingerprints: ["e7:9d:c7:89:ff:5b:e2:19:37:23:75:4d:70:75:bc:13"] # You can get this ID in the section where you registered the SSH Key
+  # - run:
+  #     name: Install dependencies
+  #    command: |
+  #      # install the dependencies needed for your playbook
+  #      apk add --update ansible
+  #- run:
+  #    name: Configure server
+  #    command: |
+  #     ansible-playbook -i inventory main.yml
+  # Exercise: Smoke Testing
+  smoke_test:
     docker:
-      - image: python:3.7-alpine3.11
+      - image: alpine:latest
     steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["e7:9d:c7:89:ff:5b:e2:19:37:23:75:4d:70:75:bc:13"] # You can get this ID in the section where you registered the SSH Key
+      - run: apk add --update curl
       - run:
-          name: Install dependencies
+          name: smoke test
           command: |
-            # install the dependencies needed for your playbook
-            apk add --update ansible
-      - run:
-          name: Configure server
-          command: |
-            ansible-playbook -i inventory main.yml
+            URL="https://blog.udacity.com/"
+            # Test if website exists
+            if curl -s --head ${URL} 
+            then
+              return 0
+            else
+              return 1
+            fi
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
   say-hello-workflow:
     jobs:
-      - configure_infrastructure
+      - smoke_test
