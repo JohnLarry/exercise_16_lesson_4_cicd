@@ -75,6 +75,7 @@ jobs:
               return 1
             else
               return 0
+            fi
       - destroy_environment
 
 #re-run smoke test
